@@ -17,14 +17,16 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// back office - area pubblica - auth
 Auth::routes();
 
+// back office - area privata
 Route::middleware('auth')
     ->namespace('Admin')
-    ->name('admin')
+    ->name('admin.')
     ->prefix('admin')
     ->group(function() {
-        Route::get('/home', 'HomeController@index')->name('home');
+     Route::get('/home', 'HomeController@index')->name('home');
     });
     
 // front office
