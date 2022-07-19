@@ -5,8 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
- 
+
 use App\Post;
+
 class PostController extends Controller
 {
     /**
@@ -40,8 +41,12 @@ class PostController extends Controller
     public function store(Request $request)
     {
         // validazione
-
-        // prendo i dati della request e creo il post+
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'content' => 'required|string|max:65535',
+            'published' => 'sometimes|accepted'
+        ]);
+        // prendo i dati dalla request e creo il post
         $data = $request->all();
         $newPost = new Post();
         $newPost->fill($data);
@@ -50,8 +55,7 @@ class PostController extends Controller
 
         $newPost->published = isset($data['published']); // true o false
         $newPost->save();
-
-        // redirect alla pagina del post appena creato 
+        // redirect alla pagina del post appena creato
         return redirect()->route('admin.posts.show', $newPost->id);
     }
 
@@ -72,9 +76,9 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Post $post)
     {
-        //
+        return view('admin.posts.edit', compact('post'));
     }
 
     /**
@@ -84,9 +88,27 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Post $post)
     {
-        //
+        // validazione
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'content' => 'required|string|max:65535',
+            'published' => 'sometimes|accepted'
+        ]);
+        // aggiornamento
+        $data = $request->all();
+        // se cambia il titolo genero un altro slug
+        if( $post->title != $data['title'] ) {
+            $post->slug = $this->getSlug($data['title']);
+        }
+        $post->fill($data);
+
+        $post->published = isset($data['published']); // true o false
+
+        $post->save();
+        // redirect
+        return redirect()->route('admin.posts.show', $post->id);
     }
 
     /**
@@ -95,9 +117,11 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Post $post)
     {
-     //  
+        $post->delete();
+
+        return redirect()->route('admin.posts.index');
     }
 
     private function getSlug($title)
