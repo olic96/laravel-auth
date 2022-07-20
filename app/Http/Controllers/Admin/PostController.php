@@ -41,11 +41,7 @@ class PostController extends Controller
     public function store(Request $request)
     {
         // validazione
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'required|string|max:65535',
-            'published' => 'sometimes|accepted'
-        ]);
+
         // prendo i dati dalla request e creo il post
         $data = $request->all();
         $newPost = new Post();
@@ -91,11 +87,7 @@ class PostController extends Controller
     public function update(Request $request, Post $post)
     {
         // validazione
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'required|string|max:65535',
-            'published' => 'sometimes|accepted'
-        ]);
+
         // aggiornamento
         $data = $request->all();
         // se cambia il titolo genero un altro slug
